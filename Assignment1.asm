@@ -108,8 +108,14 @@ main:
 	la $a0, ($t5)
 	jal printInt
 	
-	#find the average and then print it
+	#find the average and then print the quotient ($t8)
 	jal getAverage
+	la $a0, avgStr
+	jal printStr
+	la $a0, ($t8)
+	jal printInt
+	#checks if the remainder ($t9) needs to be printed if it is greater than $zero
+	bgt $t9, $zero, printRemainder
 
 	
 	# EL FIN
@@ -173,7 +179,7 @@ countPos:
 
 #Stores the sum of the input integers ($t0,$t1,$t2) into $t6
 #and then divides the sum by 3 ($t7) because there are three inputs to get the average.
-#Next, it stores the quotient into $t8 and remainder into $t9
+#Next, it stores the quotient into $t8 and remainder into $t9.
 getAverage:
 	#find the average
 	add $t6, $t0, $t1
@@ -187,6 +193,12 @@ getAverage:
 	
 	jr $ra
 
+#Prints the remainder of the average stored in $t9 as a fraction with $t7 as the divisor
 printRemainder:
-
+	#print remainder
+	la $a0, ($t9)
+	li $v0, 1
+	syscall
+	
+	#
 	jr $ra
