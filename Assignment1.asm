@@ -25,9 +25,9 @@
 # $t4 - stores the total number of zeros
 # $t5 - stores the total number of positive integers
 #
-#
-#
-#
+# $t7 - the number of integers in total (3)/ the divisor of the average
+# $t8 - the quotient of the average
+# $t9 - the remainder of the average
 #
 #---------------------------------------------------------------------------------------------
 # VARIABLES
@@ -80,9 +80,39 @@ main:
 	jal getInput
 	move $t2, $v0
 	
-	#counts the number of positive, negative & zero integers and then prints it to console
+	#counts the number of positive, negative & zero integers from the user input 
+	# FIRST Integer
+	la $a0, ($t0)
+	jal countIntegerType
+	# SECOND Integer
+	la $a0, ($t1)
+	jal countIntegerType
+	# THIRD Integer
+	la $a0, ($t2)
+	jal countIntegerType
 	
+	#prints the number of integer types (pos, neg, zero) to the console
+	# NEGATIVE INTEGERS
+	la $a0, negStr
+	jal printStr
+	la $a0, ($t3)
+	jal printInt
+	# ZERO INTEGERS
+	la $a0, zerStr
+	jal printStr
+	la $a0, ($t4)
+	jal printInt
+	# POSITIVE INTEGERS
+	la $a0, posStr
+	jal printStr
+	la $a0, ($t5)
+	jal printInt
+	
+	#find the average and then print it
+	jal getAverage
 
+	
+	# EL FIN
 	li $v0, 10
 	syscall
 	
@@ -137,4 +167,26 @@ countZero:
 #Adds a +1 to the positive integer count and stores it in $t5	
 countPos:
 	addi, $t5, $t5, 1
+	jr $ra
+
+#----------------AVERAGE-----------------
+
+#Stores the sum of the input integers ($t0,$t1,$t2) into $t6
+#and then divides the sum by 3 ($t7) because there are three inputs to get the average.
+#Next, it stores the quotient into $t8 and remainder into $t9
+getAverage:
+	#find the average
+	add $t6, $t0, $t1
+	add $t6, $t6, $t2
+	li $t7, 3
+	div $t6, $t7
+	
+	#store the quotient and the remainder of the average
+	mflo $t8
+	mfhi $t9
+	
+	jr $ra
+
+printRemainder:
+
 	jr $ra
