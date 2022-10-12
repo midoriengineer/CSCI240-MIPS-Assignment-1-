@@ -28,9 +28,9 @@
 # $t4 - stores the total number of zeros
 # $t5 - stores the total number of positive integers
 #
-# $t7 - the number of integers in total (3)/ the divisor of the average
-# $t8 - the quotient of the average
-# $t9 - the remainder of the average
+# $t7 - stores the number of integers in total (3)/ the divisor of the average
+# $t8 - stores the quotient of the average
+# $t9 - stores the remainder of the average
 #
 #---------------------------------------------------------------------------------------------
 # VARIABLES
@@ -137,18 +137,46 @@ main:
 	syscall
 	
 #---------------------------------------------------------------------------------------------
+# REGISTER USAGE: SUBROUTINES
+#---------------------------------------------------------------------------------------------
+# $a0 - temporarily stores values to be printed, moved, or calculated
+# $v0 - temporarily stores user input
+# $zero - used as a point of comparison to see if integers are positive, negative, zero, or if a remaincer exists
+#
+# $t0 - stores the first input integer
+# $t1 - stores the second input integer
+# $t2 - stores the third input integer
+#
+# $t3 - stores the total number of negative integers
+# $t4 - stores the total number of zeros
+# $t5 - stores the total number of positive integers
+#
+# $t6 - stores the sum of all the integers input by the user
+# $t7 - stores the number of integers in total (3)/ the divisor of the average
+# $t8 - stores the quotient of the average
+# $t9 - stores the remainder of the average
+#	
+#---------------------------------------------------------------------------------------------
 # SUBROUTINES
 #---------------------------------------------------------------------------------------------
 
 #----------------PRINT-----------------
 
-#prints the string loaded into $a0 to console
+#---Name: printStr
+#---Desc: prints the string loaded into $a0 to the console
+#---Param: $a0
+#---Return: none
+#---Registers used: $v0
 printStr:
 	li $v0, 4
 	syscall
 	jr $ra
 
-#prints the integer loaded into $a0 to console
+#---Name: printInt
+#---Desc: prints the integer loaded into $a0 to the console
+#---Param: $a0
+#---Return: none
+#---Registers used: $v0
 printInt:
 	li $v0, 1
 	syscall
@@ -156,7 +184,11 @@ printInt:
 	
 #----------------INPUT-----------------
 
-#recieves user input and stores it into $v0
+#---Name: getInput
+#---Desc: recieves user input and stores it into $v0
+#---Param: $a0
+#---Return: none
+#---Registers used: $v0
 getInput:
 	li $v0, 5
 	syscall
@@ -164,36 +196,57 @@ getInput:
 
 #--------------COUNTING---------------
 
-#checks if the integer stored in $a0 is positive, negative or zero and 
-#then calls a function to count the integer type based on if $a0 is 
-#equal to $zero, less than $zero or greater than $zero
+#---Name: countIntegerType
+#---Desc: checks if the integer stored in $a0 is positive, 
+#	  negative or zero and then calls a function to count 
+#	  the integer type based on if $a0 is equal to $zero, 
+#	  less than $zero or greater than $zero
+#---Param: $a0
+#---Return: none
+#---Registers used: $a0, $zero
 countIntegerType:
-
 	beq $a0, $zero, countZero
 	blt $a0, $zero, countNeg
 	bgt $a0, $zero, countPos
 	jr $ra
 
-#Adds a +1 to the negative integer count and stores it in $t3	
+#---Name: countNeg
+#---Desc: Adds a +1 to the negative integer count and stores it in $t3
+#---Param: none
+#---Return: $t3
+#---Registers used: $t3
 countNeg:
 	addi, $t3, $t3, 1
 	jr $ra
 
-#Adds a +1 to the zero integer count and stores it in $t4		
+#---Name: countZero
+#---Desc: Adds a +1 to the zero integer count and stores it in $t4	
+#---Param: none
+#---Return: $t4
+#---Registers used: $t4
 countZero:
 	addi, $t4, $t4, 1
 	jr $ra
-
-#Adds a +1 to the positive integer count and stores it in $t5	
+	
+#---Name: countPos
+#---Desc: Adds a +1 to the positive integer count and stores it in $t5
+#---Param: none
+#---Return: $t5
+#---Registers used: $t5	
 countPos:
 	addi, $t5, $t5, 1
 	jr $ra
 
 #----------------AVERAGE-----------------
 
-#Stores the sum of the input integers ($t0,$t1,$t2) into $t6
-#and then divides the sum by 3 ($t7) because there are three inputs to get the average.
-#Next, it stores the quotient into $t8 and remainder into $t9.
+#---Name: getAverage
+#---Desc: Stores the sum of the input integers ($t0,$t1,$t2) into $t6
+#	  and then divides the sum by 3 ($t7) because there are three 
+#	  inputs to get the average. Next, it stores the quotient into 
+#	  $t8 and remainder into $t9.
+#---Param: $t0, $t1, $t2
+#---Return: $t7, $t8, $t9
+#---Registers used: $t0, $t1, $t2, $t6, $t7, $t8, $t9
 getAverage:
 	#find the average
 	add $t6, $t0, $t1
@@ -207,13 +260,23 @@ getAverage:
 	
 	jr $ra
 
-#Checks if the remainder ($t9) needs to be printed by seeing if it is greater than $zero
-#If it is, then it calls the print subroutine
+#---Name: checkRemainder
+#---Desc: Checks if the remainder ($t9) needs to be printed by seeing 
+#	  if it is greater than $zero. If it is, then it calls the print 
+#	  subroutine.
+#---Param: $t9
+#---Return: none
+#---Registers used: $t9, $zero
 checkRemainder:
 	bgt $t9, $zero, printRemainder
 	jr $ra
 
-#Prints the remainder of the average stored in $t9 as a fraction with $t7 as the divisor
+#---Name: printRemainder
+#---Desc: Prints the remainder of the average stored in $t9 
+#	  as a fraction with $t7 as the divisor
+#---Param: $t7, $t9
+#---Return: none
+#---Registers used: $a0, $v0, $t7, $t9
 printRemainder:
 	#print space between remainder and quotient
 	la $a0, space
@@ -239,8 +302,13 @@ printRemainder:
 
 #-------------MAX-MIN-INTEGER--------------
 
-#checks to see if the integers $t1 or $t2 are bigger than the first integer $t0
-# and then stores the largest integer in $a0
+#---Name: getMaxInteger
+#---Desc: checks to see if the integers $t1 or $t2 are 
+#	  bigger than the first integer $t0 and then 
+#	  stores the largest integer in $a0
+#---Param: $t0, $t1, $t2
+#---Return: $a0, $a1
+#---Registers used: $a0, $a1, $t0, $t1, $t2
 getMaxInteger:
 	la $a0, ($t0)
 	la $a1, ($t1)
@@ -249,8 +317,13 @@ getMaxInteger:
 	bgt $a1, $a0, setMaxMinValue
 	jr $ra
 
-#checks to see if the integers $t1 or $t2 are smaller than the first integer $t0
-# and then stores the smallest integer in $a0	
+#---Name: getMinInteger
+#---Desc: checks to see if the integers $t1 or $t2 are
+#	  smaller than the first integer $t0 and then 
+#	  stores the smallest integer in $a0
+#---Param: $t0, $t1, $t2
+#---Return: $a0, $a1
+#---Registers used: $a0, $a1, $t0, $t1, $t2
 getMinInteger:
 	la $a0, ($t0)
 	la $a1, ($t1)
@@ -258,9 +331,13 @@ getMinInteger:
 	la $a1, ($t2)
 	blt $a1, $a0, setMaxMinValue
 	jr $ra
-	
-#replaces the 2nd smallest or biggest ($a0) with the next biggest or smallest integer ($a0)
-# and stores it in $a0
+
+#---Name: setMaxMinValue
+#---Desc: replaces the 2nd smallest or biggest ($a0) with the 
+#	  next biggest or smallest integer ($a0) and stores it in $a0
+#---Param: $a0, $a1
+#---Return: $a0
+#---Registers used: $a0, $a1
 setMaxMinValue:
 	la $a0, ($a1)
 	jr $ra
