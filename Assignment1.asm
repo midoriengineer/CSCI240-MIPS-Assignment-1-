@@ -49,7 +49,7 @@ maxStr:	.asciiz "\nLargest integer: "
 minStr:	.asciiz "\nSmallest integer: "
 
 space:	.asciiz " "
-slash:	.asciiz "/ "
+slash:	.asciiz "/"
 
 	.text
 #---------------------------------------------------------------------------------------------
@@ -114,8 +114,8 @@ main:
 	jal printStr
 	la $a0, ($t8)
 	jal printInt
-	#checks if the remainder ($t9) needs to be printed if it is greater than $zero
-	bgt $t9, $zero, printRemainder
+	#checks if the remainder needs to be printed and prints it if so
+	jal checkRemainder
 
 	
 	# EL FIN
@@ -193,12 +193,32 @@ getAverage:
 	
 	jr $ra
 
+#Checks if the remainder ($t9) needs to be printed by seeing if it is greater than $zero
+#If it is, then it calls the print subroutine
+checkRemainder:
+	bgt $t9, $zero, printRemainder
+	jr $ra
+
 #Prints the remainder of the average stored in $t9 as a fraction with $t7 as the divisor
 printRemainder:
+	#print space between remainder and quotient
+	la $a0, space
+	li $v0, 4
+	syscall
+	
 	#print remainder
 	la $a0, ($t9)
 	li $v0, 1
 	syscall
 	
-	#
+	#prints the slash of the fraction
+	la $a0, slash
+	li $v0, 4
+	syscall
+	
+	#prints the divisor of the fraction
+	la $a0, ($t7)
+	li $v0, 1
+	syscall
+	
 	jr $ra
