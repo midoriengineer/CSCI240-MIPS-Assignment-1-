@@ -8,8 +8,11 @@
 #---------------------------------------------------------------------------------------------
 # PROGRAM DESCRIPTION
 #---------------------------------------------------------------------------------------------
-#
-#
+# This program asks the user to enter in three integers and then counts the number of zeros, 
+# positive integers, and negative integers that the user input (and then prints the count).
+# The program also computes and prints the average of the three integers in the form of a 
+# quotient and a fractional remainder (if applicable). Lastly, the program finds and prints
+# the largest and the smallest integer that the user input.
 #
 #---------------------------------------------------------------------------------------------
 # REGISTER USAGE: MAIN
@@ -117,7 +120,18 @@ main:
 	#checks if the remainder needs to be printed and prints it if so
 	jal checkRemainder
 
-	
+	#compares the integers to find the largest and then prints it
+	la $a0, maxStr
+	jal printStr
+	jal getMaxInteger
+	jal printInt
+
+	#compares the integers to find the smallest and then prints it
+	la $a0, minStr
+	jal printStr
+	jal getMinInteger
+	jal printInt
+		
 	# EL FIN
 	li $v0, 10
 	syscall
@@ -221,4 +235,32 @@ printRemainder:
 	li $v0, 1
 	syscall
 	
+	jr $ra
+
+#-------------MAX-MIN-INTEGER--------------
+
+#checks to see if the integers $t1 or $t2 are bigger than the first integer $t0
+# and then stores the largest integer in $a0
+getMaxInteger:
+	la $a0, ($t0)
+	la $a1, ($t1)
+	bgt $a1, $a0, setMaxMinValue
+	la $a1, ($t2)
+	bgt $a1, $a0, setMaxMinValue
+	jr $ra
+
+#checks to see if the integers $t1 or $t2 are smaller than the first integer $t0
+# and then stores the smallest integer in $a0	
+getMinInteger:
+	la $a0, ($t0)
+	la $a1, ($t1)
+	blt $a1, $a0, setMaxMinValue
+	la $a1, ($t2)
+	blt $a1, $a0, setMaxMinValue
+	jr $ra
+	
+#replaces the 2nd smallest or biggest ($a0) with the next biggest or smallest integer ($a0)
+# and stores it in $a0
+setMaxMinValue:
+	la $a0, ($a1)
 	jr $ra
