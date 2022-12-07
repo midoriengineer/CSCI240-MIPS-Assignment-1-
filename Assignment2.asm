@@ -33,8 +33,9 @@
 #---------------------------------------------------------------------------------------------
 	.data
 	
-prompt: .asciiz "Enter a pair of integers"
-prompt2:	.asciiz	"\nEnter a 1 or 0 "
+prompt1: .asciiz "Enter an integer: "
+prompt2: .asciiz "Enter another integer: "
+prompt3:	.asciiz	"\nEnter a 1 or 0 "
 output:	.asciiz	"array A[3][3]:"
 
 A:	.space 36 #each -1
@@ -46,32 +47,69 @@ divider:	.asciiz "|"
 X:		.asciiz "X"
 O:		.asciiz "O"
 
+	.text
 #---------------------------------------------------------------------------------------------
 # MAIN
 #---------------------------------------------------------------------------------------------
 
 main:
-
 	#for comparison purposes to exit loop
 	li $t9, -1 
 	
-	#Asks the user to input three integers
-	la $a0, prompt
-	jal printStr
+	#initialize array A's elements to -1
+	la $t0, A
+	li $t1, 1
+	li $t2, 9
+	move $t3, $t0
+loop0:	bgt $t1, $t2, exit0
+	sb $t9, 0($t3)
+	addi $t1, $t1, 1
+	addi $t3, $t3, 4
+	j loop0
+
+exit0:
+
+#	li $t1, 1
+#	li $t2, 9
+#	move $t3, $t0
+#loop00:	bgt $t1, $t2, exit00
+#	lb $a0, 0($t3)
+#	li $v0, 1
+#	syscall
+#	addi $t1, $t1, 1
+#	addi $t3, $t3, 4
+#	j loop00
+#	
+#exit00:
 
 #loops until the first and second input equals -1
 loop1:	
-	#stores first input into $t0
-	jal getInput
-	move $t0, $v0
+
+	#Asks the user to input an integer
+	la $a0, prompt1
+	jal printStr
 	
-	#stores second input stores input into $t1
+	#stores first input into $t1
 	jal getInput
 	move $t1, $v0
 	
+	#Asks the user to input another integer
+	la $a0, prompt2
+	jal printStr
+	
+	#stores second input stores input into $t2
+	jal getInput
+	move $t2, $v0
+	
 	#check if either input equals -1 to terminate loop
-	beq $t9, $t0, checkIfExit
 	beq $t9, $t1, checkIfExit
+	beq $t9, $t2, checkIfExit
+	
+	#check if either input is NOT equal to 0, 1 or 2 
+	bgt $t1, 2, loop1
+	bgt $t2, 2, loop1
+	blt $t1, $zero, loop1
+	blt $t2, $zero, loop1
 	
 	
 	
@@ -80,10 +118,11 @@ loop1:
 
 checkIfExit:
 	#check if user inputs are both -1
-	beq $t0, $t1, exit1
+	beq $t1, $t2, exit1
 	
-	#if only one input is -1, return to start of loop
+	#if only one input is -1, return to start of loop1
 	j loop1
+	
 	
 exit1:
 		
