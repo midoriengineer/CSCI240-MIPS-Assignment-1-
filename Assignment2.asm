@@ -36,16 +36,15 @@
 prompt1: .asciiz "Enter an integer: "
 prompt2: .asciiz "Enter another integer: "
 prompt3: .asciiz "Enter a 1 or 0: "
-output:	.asciiz	"array A[3][3]:"
+output:	.asciiz	"\nContents of array A[3][3]:\n\n"
 
 A:	.space 36 #each -1
 
-newline:	.asciiz		"\n"
-line:	.asciiz "-----------"
-space:	.asciiz " "
+line:	.asciiz "\n-----------\n"
+space:	.asciiz "   "
 divider:	.asciiz "|"
-X:		.asciiz "X"
-O:		.asciiz "O"
+X:		.asciiz " X "
+O:		.asciiz " O "
 
 	.text
 #---------------------------------------------------------------------------------------------
@@ -69,18 +68,7 @@ loop0:	bgt $t1, $t2, exit0
 
 exit0:
 
-#	li $t1, 1
-#	li $t2, 9
-#	move $t3, $t0
-#loop00:	bgt $t1, $t2, exit00
-#	lb $a0, 0($t3)
-#	li $v0, 1
-#	syscall
-#	addi $t1, $t1, 1
-#	addi $t3, $t3, 4
-#	j loop00
-#	
-#exit00:
+
 
 #loops until the first and second input equals -1
 loop1:	
@@ -128,17 +116,18 @@ loop1:
 	move $t3, $t0
 	li $t5, 3
 	li $t6, 4
-	mult $t7, $t1, $t5
+	mult $t1, $t5
+	mflo $t7
 	add $t7, $t7, $t2
-	mult $t7, $t7, $t6
+	mult $t7, $t6
+	mflo $t7
 	add $t3, $t3, $t7
 	
-	
-	
-	
-	
+	#store contents of user input into A[$t1][$t2]
+	sb $t4, 0($t3)
 	
 	j loop1
+	
 
 checkIfExit:
 	#check if user inputs are both -1
@@ -149,7 +138,58 @@ checkIfExit:
 	
 	
 exit1:
-		
+
+#Prints out output--------------------------------------------------
+	la $a0, output
+	jal printStr
+	
+	li $t1, 1
+	li $t2, 9
+	move $t3, $t0
+print:	bgt $t1, $t2, exit2
+
+	#print a x,o or space depending on if value of array elements
+	beq 0($t3), -1, printSpace
+	beq 0($t3), 1, printX
+	beq 0($t3), 0, printO
+	
+
+printSpace:
+	la $a0, space
+	jal printStr
+	j continuePrint
+
+printX:
+	la $a0, X
+	jal printStr
+	j continuePrint
+
+printO:
+	la $a0, O
+	jal printStr
+
+
+continuePrint:	
+	addi $t1, $t1, 1
+	addi $t3, $t3, 4
+	
+	beq $t1, 4, printLine
+	beq $t1, 7, printLine
+	beq $t1, 10, exit2
+	
+	la $a0, divider
+	jal printStr
+	
+	j print
+	
+printLine: 
+	la $a0, line
+	jal printStr
+	
+	j print
+	
+	
+exit2:	
 	# EL FIN
 	li $v0, 10
 	syscall
@@ -157,22 +197,8 @@ exit1:
 #---------------------------------------------------------------------------------------------
 # REGISTER USAGE: SUBROUTINES
 #---------------------------------------------------------------------------------------------
-# $a0 - temporarily stores values to be printed, moved, or calculated
+# $a0 - temporarily stores values to be printed
 # $v0 - temporarily stores user input
-# $zero - used as a point of comparison to see if integers are positive, negative, zero, or if a remaincer exists
-#
-# $t0 - stores the first input integer
-# $t1 - stores the second input integer
-# $t2 - stores the third input integer
-#
-# $t3 - stores the total number of negative integers
-# $t4 - stores the total number of zeros
-# $t5 - stores the total number of positive integers
-#
-# $t6 - stores the sum of all the integers input by the user
-# $t7 - stores the number of integers in total (3)/ the divisor of the average
-# $t8 - stores the quotient of the average
-# $t9 - stores the remainder of the average
 #	
 #---------------------------------------------------------------------------------------------
 # SUBROUTINES
@@ -190,15 +216,6 @@ printStr:
 	syscall
 	jr $ra
 
-#---Name: printInt
-#---Desc: prints the integer loaded into $a0 to the console
-#---Param: $a0
-#---Return: none
-#---Registers used: $v0
-printInt:
-	li $v0, 1
-	syscall
-	jr $ra
 	
 #----------------INPUT-----------------
 
