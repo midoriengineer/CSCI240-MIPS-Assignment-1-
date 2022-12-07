@@ -8,7 +8,13 @@
 #---------------------------------------------------------------------------------------------
 # PROGRAM DESCRIPTION
 #---------------------------------------------------------------------------------------------
-
+# This programs takes in a row number and a column number for user input, and allows the user
+# to input the value 1 or 0 into the 2D array A based on which column/row number they picked. 
+# This program will keep repeating until the user enters -1 for both the row and column number.
+# Afterwards, the loop terminates and prints a 2D board representation of the values entered
+# into each element of the array A by the user. If the user input a 1 into the array, an X will 
+# be printed to the board. If the user input 0, an O will be printed. If the user did not input
+# anything into an array element, the only spaces will be printed.
 #
 #---------------------------------------------------------------------------------------------
 # REGISTER USAGE: MAIN
@@ -35,9 +41,9 @@
 #---------------------------------------------------------------------------------------------
 	.data
 	
-prompt1: .asciiz "Enter a row number: "
+prompt1: .asciiz "\nType -1 for the row number and -1 for the column number to terminate the loop.\nOtherwise type 0, 1, or 2 for the row number and 0, 1, or 2 for the column number.\nEnter a row number: "
 prompt2: .asciiz "Enter a column number: "
-prompt3: .asciiz "Enter a 1 or 0: "
+prompt3: .asciiz "Enter either 0 or 1: "
 output:	.asciiz	"\nContents of array A[3][3]:\n\n"
 
 A:	.space 36 #each -1
@@ -68,10 +74,7 @@ loop0:	bgt $t1, $t2, exit0
 	addi $t1, $t1, 1
 	addi $t3, $t3, 4
 	j loop0
-
 exit0:
-
-
 
 #loops until the first and second input equals -1
 loop1:	
@@ -130,7 +133,6 @@ loop1:
 	sb $t4, 0($t3)
 	
 	j loop1
-	
 
 checkIfExit:
 	#check if user inputs are both -1
@@ -138,8 +140,6 @@ checkIfExit:
 	
 	#if only one input is -1, return to start of loop1
 	j loop1
-	
-	
 exit1:
 
 #Prints output--------------------------------------------------
