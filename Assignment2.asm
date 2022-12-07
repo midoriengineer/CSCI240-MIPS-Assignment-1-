@@ -35,7 +35,7 @@
 	
 prompt1: .asciiz "Enter an integer: "
 prompt2: .asciiz "Enter another integer: "
-prompt3:	.asciiz	"\nEnter a 1 or 0 "
+prompt3: .asciiz "Enter a 1 or 0: "
 output:	.asciiz	"array A[3][3]:"
 
 A:	.space 36 #each -1
@@ -110,6 +110,30 @@ loop1:
 	bgt $t2, 2, loop1
 	blt $t1, $zero, loop1
 	blt $t2, $zero, loop1
+	
+	
+	#Asks the user to input a 1 or 0 into array
+	la $a0, prompt3
+	jal printStr
+	
+	#stores input into $t4
+	jal getInput
+	move $t4, $v0
+	
+	#check if either input is NOT equal to 0 or 1
+	bgt $t4, 1, loop1
+	blt $t4, $zero, loop1
+	
+	#calculate the address of element A[$t1][$t2] into $t3
+	move $t3, $t0
+	li $t5, 3
+	li $t6, 4
+	mult $t7, $t1, $t5
+	add $t7, $t7, $t2
+	mult $t7, $t7, $t6
+	add $t3, $t3, $t7
+	
+	
 	
 	
 	
