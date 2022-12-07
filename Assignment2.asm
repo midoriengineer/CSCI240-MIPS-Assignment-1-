@@ -16,25 +16,27 @@
 # $a0 - temporarily stores values to be printed, moved, or calculated
 # $v0 - temporarily stores user input
 #
-# $t0 - stores the first input integer
-# $t1 - stores the second input integer
-# $t2 - stores the third input integer
-#
-# $t3 - stores the total number of negative integers
-# $t4 - stores the total number of zeros
-# $t5 - stores the total number of positive integers
-#
-# $t7 - stores the number of integers in total (3)/ the divisor of the average
-# $t8 - stores the quotient of the average
-# $t9 - stores the remainder of the average
+# $t0 - stores the address of the first element of array A
+# $t3 - stores the address of various elements in array A at different points within a loop
+
+# $t1 - temporarily stores the counter for loops through the array; stores the first input integer
+# $t2 - temporarily stores the exit number for the counter for the array loops; stores the second input integer
+
+# $t4 - temporarily stores user input of 1 or 0; 
+# $t5 - used to store the number of columns for the calculations for the address of element A[$t1][$t2]
+# $t6 -used to store word size for the calculations for the address of element A[$t1][$t2]
+# $t7 - used to store overall calculations for the address of element A[$t1][$t2]
+# $t8 - stores the contents of the address stored in $t3
+
+# $t9 - stores the integer -1 for initialization and comparison purposes
 #
 #---------------------------------------------------------------------------------------------
 # VARIABLES
 #---------------------------------------------------------------------------------------------
 	.data
 	
-prompt1: .asciiz "Enter an integer: "
-prompt2: .asciiz "Enter another integer: "
+prompt1: .asciiz "Enter a row number: "
+prompt2: .asciiz "Enter a column number: "
 prompt3: .asciiz "Enter a 1 or 0: "
 output:	.asciiz	"\nContents of array A[3][3]:\n\n"
 
@@ -55,11 +57,12 @@ main:
 	#for comparison purposes to exit loop
 	li $t9, -1 
 	
-	#initialize array A's elements to -1
+	#setup counter for loop
 	la $t0, A
 	li $t1, 1
 	li $t2, 9
 	move $t3, $t0
+	#initialize array A's elements to -1
 loop0:	bgt $t1, $t2, exit0
 	sb $t9, 0($t3)
 	addi $t1, $t1, 1
@@ -139,55 +142,38 @@ checkIfExit:
 	
 exit1:
 
-#Prints out output--------------------------------------------------
+#Prints output--------------------------------------------------
 	la $a0, output
 	jal printStr
 	
+	#setup counter for loop
 	li $t1, 1
 	li $t2, 9
 	move $t3, $t0
 print:	bgt $t1, $t2, exit2
 
 	#print a x,o or space depending on if value of array elements
-	beq 0($t3), -1, printSpace
-	beq 0($t3), 1, printX
-	beq 0($t3), 0, printO
-	
-
-printSpace:
-	la $a0, space
-	jal printStr
-	j continuePrint
-
-printX:
-	la $a0, X
-	jal printStr
-	j continuePrint
-
-printO:
-	la $a0, O
-	jal printStr
-
+	lb $t8, 0($t3)
+	beq $t8, -1, printSpace
+	beq $t8, 1, printX
+	beq $t8, 0, printO
 
 continuePrint:	
+
+	#update current address and counters
 	addi $t1, $t1, 1
 	addi $t3, $t3, 4
 	
+	#if row ends, print long horizontal line
 	beq $t1, 4, printLine
 	beq $t1, 7, printLine
 	beq $t1, 10, exit2
 	
+	#if line doesn't end, print out vertical divider
 	la $a0, divider
 	jal printStr
 	
 	j print
-	
-printLine: 
-	la $a0, line
-	jal printStr
-	
-	j print
-	
 	
 exit2:	
 	# EL FIN
@@ -216,6 +202,46 @@ printStr:
 	syscall
 	jr $ra
 
+#---Name: printLine
+#---Desc: prints a long horizontal line loaded into $a0 to the console and then returns to the top of the print loop
+#---Param: $a0
+#---Return: none
+#---Registers used: $v0
+printLine: 
+	la $a0, line
+	jal printStr
+	j print
+
+#---Name: printSpace
+#---Desc: prints three spaces loaded into $a0 to the console and then returns to the middle of the print loop
+#---Param: none
+#---Return: none
+#---Registers used: $a0
+printSpace:
+	la $a0, space
+	jal printStr
+	j continuePrint
+
+#---Name: printX
+#---Desc: prints " X " loaded into $a0 to the console and then returns to the middle of the print loop
+#---Param: none
+#---Return: none
+#---Registers used: $a0
+printX:
+	la $a0, X
+	jal printStr
+	j continuePrint
+
+#---Name: printO
+#---Desc: prints " O " loaded into $a0 to the console and then returns to the middle of the print loop
+#---Param: none
+#---Return: none
+#---Registers used: $a0
+printO:
+	la $a0, O
+	jal printStr
+	j continuePrint
+	
 	
 #----------------INPUT-----------------
 
